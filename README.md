@@ -1,6 +1,10 @@
 # HP iLO Metrics Exporter
 
 Blackbox likes exporter used to exports HP Server Integrated Lights Out (iLO) states to Prometheus.
+This version is modified for Python3. 
+
+The password is given by an environment variable ilo_password = getenv('ILO', 'ILO environment variable missing')
+You can set ILO in /etc/environment like this: export ILO='xxx'
 
 ### Gauges
 
@@ -81,9 +85,9 @@ To build the image yourself
 docker build --rm -t hpilo-exporter .
 ```
 
-To run the container
+To run the container and use the ILO environment variable for password
 ```
-docker run -p 9416:9416 hpilo-exporter:latest
+docker run -e ILO -p 9416:9416 hpilo-exporter:latest
 ```
 
 You can then call the web server on the defined endpoint, `/metrics` by default.
@@ -93,6 +97,7 @@ curl 'http://127.0.0.1:9416/metrics?ilo_host=127.0.0.1&ilo_port=443&ilo_user=adm
 
 Passing argument to the docker run command
 ```
+docker run -p 9416:9416 hpilo-exporter:latest --port 9416 --ilo_user my_user -e ILO  # ILO is an environment variable
 docker run -p 9416:9416 hpilo-exporter:latest --port 9416 --ilo_user my_user --ilo_password my_secret_password
 ```
 
