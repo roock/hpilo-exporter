@@ -1,19 +1,38 @@
+#!/usr/bin/python3
+
 """
 Pulls data from specified iLO and presents as Prometheus metrics
 """
-from __future__ import print_function
+
+from __future__ import absolute_import # Must be at the beginning of this file!
+from __future__ import print_function  # Must be at the beginning of this file!
+
+from os import getenv # for ilo_password
+
 from _socket import gaierror
+
 import sys
 import hpilo
 
 import time
-import prometheus_metrics
-from BaseHTTPServer import BaseHTTPRequestHandler
-from BaseHTTPServer import HTTPServer
-from SocketServer import ForkingMixIn
+import hpilo_exporter.prometheus_metrics as prometheus_metrics # Python3
+# prometeus_metrics is a file with the metrics definitions
+
+#from BaseHTTPServer import BaseHTTPRequestHandler
+#from BaseHTTPServer import HTTPServer
+from  http.server import BaseHTTPRequestHandler # Python3
+from  http.server import HTTPServer             # Python3
+
+# from SocketServer import ForkingMixIn
+from socketserver import ForkingMixIn           # Python 3
 from prometheus_client import generate_latest, Summary
-from urlparse import parse_qs
-from urlparse import urlparse
+
+# from urlparse import parse_qs
+# from urlparse import urlparse
+from urllib.parse import parse_qs               # Python3
+from urllib.parse import urlparse               # Python3
+
+
 
 
 def print_err(*args, **kwargs):
@@ -26,6 +45,7 @@ REQUEST_TIME = Summary(
 
 
 class ForkingHTTPServer(ForkingMixIn, HTTPServer):
+
     max_children = 30
     timeout = 30
 
@@ -60,8 +80,10 @@ class RequestHandler(BaseHTTPRequestHandler):
             ilo_host = query_components['ilo_host'][0]
             ilo_port = int(query_components['ilo_port'][0])
             ilo_user = query_components['ilo_user'][0]
-            ilo_password = query_components['ilo_password'][0]
-        except KeyError, e:
+            # ilo_password = query_components['ilo_password'][0]
+            ilo_password = getenv('ILO', 'ILO environment variable missing')
+        # except KeyError, e:   valid only in Python2
+        except KeyError as e:   # Python3
             print_err("missing parameter %s" % e)
             self.return_error()
             error_detected = True
@@ -80,7 +102,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             except gaierror:
                 print("ILO invalid address or port")
                 self.return_error()
-            except hpilo.IloCommunicationError, e:
+            # except hpilo.IloCommunicationError, e:  # Python2
+            except hpilo.IloCommunicationError as e:  # Python3
+
                 print(e)
 
             # get product and server name
@@ -96,10 +120,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             except:
                 server_name = ilo_host
 
-            # get health
+            # get iLO health information 
             embedded_health = ilo.get_embedded_health()
-            health_at_glance = embedded_health['health_at_a_glance']
+            # print_err('STRUCTURE: {}'.format(embedded_health))
             
+            health_at_glance = embedded_health['health_at_a_glance'] 
             if health_at_glance is not None:
                 for key, value in health_at_glance.items():
                     for status in value.items():
@@ -120,22 +145,35 @@ class RequestHandler(BaseHTTPRequestHandler):
             else:
                 # get nic information
                 for nic_name,nic in embedded_health['nic_information'].items():
+                   # print_err('nic: {}'.format(nic))
                    try:
-                       value = ['OK','Disabled','Unknown','Link Down'].index(nic['status'])
+                       value = ['OK','Disabled','Unknown','Link Down'].index(nic['status']) # returns the index of 'status' like 0 or 1     0 means OK
+                       # print_err( "nic status: {}".format(nic['status']) )  # returns OK and Unknown
+ 
                    except ValueError:
                        value = 4
                        print_err('unrecognised nic status: {}'.format(nic['status']))
 
+                   # print_err('ip_address of %s: {}'.format(nic['ip_address']) % nic_name ) 
                    prometheus_metrics.hpilo_nic_status_gauge.labels(product_name=product_name,
                                                                     server_name=server_name,
                                                                     nic_name=nic_name,
-                                                                    ip_address=nic['ip_address']).set(value)
+                                                                    mac_address=nic['mac_address'],
+                                                                    ip_address=nic['ip_address'],
+                                                                    network_port=nic['network_port']).set(value)
 
             # get firmware version
             fw_version = ilo.get_fw_version()["firmware_version"]
+            management_processor = ilo.get_fw_version()["management_processor"]
+            license_type = ilo.get_fw_version()["license_type"]
             # prometheus_metrics.hpilo_firmware_version.set(fw_version)
             prometheus_metrics.hpilo_firmware_version.labels(product_name=product_name,
-                                                             server_name=server_name).set(fw_version)
+                                                             server_name=server_name,
+                                                             management_processor=management_processor,
+                                                             license_type=license_type).set(fw_version)
+            # ip = ilo.get_network_settings()['ip_address']
+            # print_err( "ip: {}".format(ip) ) 
+
 
             # get the amount of time the request took
             REQUEST_TIME.observe(time.time() - start_time)
