@@ -132,7 +132,8 @@ Assuming:
     ilo_password: ['my_ilo_password']
   static_configs:
     - targets:
-      - ilo_fqdn.domain
+      - ilo1_fqdn.domain  # URL ilo board 1
+      - ilo2_fqdn.domain  # URL ilo board 2
 
   relabel_configs:
     - source_labels: [__address__]
@@ -140,6 +141,6 @@ Assuming:
     - source_labels: [__param_ilo_host]
       target_label: ilo_host
     - target_label: __address__
-      replacement: hpilo:8082  # hpilo exporter.
+      replacement: myserver.tld:9416  # server:port hpilo-exporter is running on - customize yourself
 ```
 
