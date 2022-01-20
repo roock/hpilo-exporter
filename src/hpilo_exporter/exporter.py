@@ -7,7 +7,8 @@ Pulls data from specified iLO and presents as Prometheus metrics
 from __future__ import absolute_import # Must be at the beginning of this file!
 from __future__ import print_function  # Must be at the beginning of this file!
 
-from os import getenv # for ilo_password
+import os      # for ilo_password
+import psutil  # process handling, zombies
 
 from _socket import gaierror
 
@@ -81,7 +82,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             ilo_port = int(query_components['ilo_port'][0])
             ilo_user = query_components['ilo_user'][0]
             # ilo_password = query_components['ilo_password'][0]
-            ilo_password = getenv('ILO', 'ILO environment variable missing')
+            ilo_password = os.getenv('ILO', 'ILO environment variable missing')
         # except KeyError, e:   valid only in Python2
         except KeyError as e:   # Python3
             print_err("missing parameter %s" % e)
@@ -222,10 +223,23 @@ class ILOExporterServer(object):
 
         server = ForkingHTTPServer((self._address, self._port), RequestHandler)
         server.endpoint = self.endpoint
-
+        
+        pid = None
         try:
             while True:
                 server.handle_request()
+                
+                # new block waiting for zombies
+                for proc in psutil.process_iter():   
+                    if 'hpilo-exporter' in proc.name():
+                        pid = proc.pid
+                        p = psutil.Process(pid)
+                        if p.status() == psutil.STATUS_ZOMBIE:
+                            # print("wait for pid: " + str(pid) + " p.status: " + str(  p.status()  )  ) # running, sleeping, zombie
+                            if (pid != 0):
+                                os.waitid(os.P_PID, pid, os.WEXITED) # terminate zombie
+                        pid = None
+                
         except KeyboardInterrupt:
             print_err("Killing exporter")
             server.server_close()
