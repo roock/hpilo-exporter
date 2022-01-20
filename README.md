@@ -3,8 +3,8 @@
 Blackbox likes exporter used to exports HP Server Integrated Lights Out (iLO) states to Prometheus.
 This version is modified for Python3. 
 
-The password is given by an environment variable ilo_password = getenv('ILO', 'ILO environment variable missing')
-You can set ILO in /etc/environment like this: export ILO='xxx'
+The password is given by an environment variable ilo_password = os.getenv('ILO', 'ILO environment variable missing')
+You can set ILO in /etc/environment like this: ILO='xxx'
 
 ### Gauges
 
@@ -45,8 +45,8 @@ hpilo_power_supplies{product_name="ProLiant DL360 Gen9",server_name="name.fqdn.d
 hpilo_processor{product_name="ProLiant DL360 Gen9",server_name="name.fqdn.domain"} 0.0
 hpilo_network{product_name="ProLiant DL360 Gen9",server_name="name.fqdn.domain"} 2.0
 hpilo_temperature{product_name="ProLiant DL360 Gen9",server_name="name.fqdn.domain"} 0.0
-hpilo_vrm{product_name="ProLiant DL380 Gen6",server_name="name.fqdn.domain"} 0.0
-hpilo_drive{product_name="ProLiant DL380 Gen6",server_name="name.fqdn.domain"} 0.0
+# hpilo_vrm{product_name="ProLiant DL380 Gen6",server_name="name.fqdn.domain"} 0.0
+# hpilo_drive{product_name="ProLiant DL380 Gen6",server_name="name.fqdn.domain"} 0.0
 hpilo_firmware_version{product_name="ProLiant DL360 Gen9",server_name="name.fqdn.domain"} 2.5
 ```
 
@@ -57,7 +57,7 @@ To run, you must have `Python` and `pip` installed.
 
 To install with `pip`:
 ```
-pip install -e $HPILO_EXPORTER_DIR
+pip3 install -e $HPILO_EXPORTER_DIR
 ```
 
 Then just:
@@ -73,12 +73,6 @@ pip install hpilo-exporter
 ```
 
 ### Docker
-
-Prebuild images are available from the docker repository:
-```
-idnt/hpilo-exporter:latest
-```
-
 
 To build the image yourself
 ```
@@ -98,7 +92,7 @@ curl 'http://127.0.0.1:9416/metrics?ilo_host=127.0.0.1&ilo_port=443&ilo_user=adm
 Passing argument to the docker run command
 ```
 docker run -p 9416:9416 hpilo-exporter:latest --port 9416 --ilo_user my_user -e ILO  # ILO is an environment variable
-docker run -p 9416:9416 hpilo-exporter:latest --port 9416 --ilo_user my_user --ilo_password my_secret_password
+or: docker run -p 9416:9416 hpilo-exporter:latest --port 9416 --ilo_user my_user --ilo_password my_secret_password
 ```
 
 ### Docker compose
