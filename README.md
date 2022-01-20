@@ -86,7 +86,7 @@ docker run -e ILO -p 9416:9416 hpilo-exporter:latest
 
 You can then call the web server on the defined endpoint, `/metrics` by default.
 ```
-curl 'http://127.0.0.1:9416/metrics?ilo_host=127.0.0.1&ilo_port=443&ilo_user=admin&ilo_password=admin'
+curl 'http://127.0.0.1:9416/metrics?ilo_host=127.0.0.1&ilo_port=443&ilo_user=xxx&ilo_password=xxx'
 ```
 
 Passing argument to the docker run command
