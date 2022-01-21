@@ -1,7 +1,7 @@
 FROM python:3.10.1-alpine3.15
 ADD . /usr/src/hpilo_exporter
 
-# Install psutil - needs linux-headers and build-base with gcc, remove it afterwards. Install exporter.
+# Install psutil - needs linux-headers and build-base with gcc, remove it afterwards by name '.build-steps'. Install exporter.
 RUN apk update && apk add --no-cache --virtual .build-steps linux-headers build-base && pip install psutil && pip install -e /usr/src/hpilo_exporter && apk del .build-steps
 
 ENTRYPOINT ["hpilo-exporter"]
