@@ -5,6 +5,13 @@ from prometheus_client import REGISTRY
 
 registry = REGISTRY
 
+# controller metrics
+hpilo_controller_status_gauge = Gauge('hpilo_controller_status', 'HP iLO controller status 0 = OK 1 = OTHER', ["label","status","controller_status","serial_number","model","fw_version","product_name", "server_name"])
+hpilo_controller_status_1_gauge = Gauge('hpilo_controller_status_1', 'HP iLO controller status 0 = OK 1 = OTHER', ["label","status","controller_status","serial_number","model","fw_version","product_name", "server_name"])
+hpilo_controller_status_3_gauge = Gauge('hpilo_controller_status_3', 'HP iLO controller status 0 = OK 1 = OTHER', ["label","status","controller_status","serial_number","model","fw_version","product_name", "server_name"])
+# controller metrics end
+
+
 # hpilo_vrm_gauge = Gauge('hpilo_vrm', 'HP iLO vrm status', ["product_name", "server_name"])
 # hpilo_drive_gauge = Gauge('hpilo_drive', 'HP iLO drive status', ["product_name", "server_name"])
 hpilo_battery_gauge = Gauge('hpilo_battery', 'HP iLO battery status  0 = OK, 1 = DEGRADED; 2 = Other', ["product_name", "server_name"])
@@ -35,5 +42,9 @@ gauges = {
     'hpilo_processor_gauge': hpilo_processor_gauge,
     'hpilo_network_gauge': hpilo_network_gauge,
     'hpilo_temperature_gauge': hpilo_temperature_gauge,
-    'hpilo_firmware_version': hpilo_firmware_version
+    'hpilo_firmware_version': hpilo_firmware_version,
+    'hpilo_controller_status_gauge': hpilo_controller_status_gauge,
+    'hpilo_controller_status_1_gauge': hpilo_controller_status_1_gauge,
+    'hpilo_controller_status_3_gauge': hpilo_controller_status_3_gauge
+
 }
