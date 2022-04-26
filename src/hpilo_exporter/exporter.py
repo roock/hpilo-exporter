@@ -125,6 +125,68 @@ class RequestHandler(BaseHTTPRequestHandler):
             embedded_health = ilo.get_embedded_health()
             # print_err('STRUCTURE: {}'.format(embedded_health))
             
+            # controller
+            # Parse Controller Info
+            try:
+              # storage = embedded_health['storage']
+              controller_on_system_board = embedded_health['storage']['Controller on System Board'] 
+              label             = embedded_health['storage']['Controller on System Board']['label']
+              status            = embedded_health['storage']['Controller on System Board']['status']
+              controller_status = embedded_health['storage']['Controller on System Board']['controller_status']
+              model             = embedded_health['storage']['Controller on System Board']['model']
+              serial_number     = embedded_health['storage']['Controller on System Board']['serial_number']
+              fw_version        = embedded_health['storage']['Controller on System Board']['fw_version']
+            except:
+                controller_on_system_board = None
+            
+            # There are controller in slot 1 and in slot 3 in one server
+            try:
+              controller_in_slot_1 = embedded_health['storage']['Controller in Slot 1']  
+              label_1              = embedded_health['storage']['Controller in Slot 1']['label']
+              status_1             = embedded_health['storage']['Controller in Slot 1']['status']
+              controller_status_1  = embedded_health['storage']['Controller in Slot 1']['controller_status']
+              model_1              = embedded_health['storage']['Controller in Slot 1']['model']
+              serial_number_1      = embedded_health['storage']['Controller in Slot 1']['serial_number']
+              fw_version_1         = embedded_health['storage']['Controller in Slot 1']['fw_version']
+            except:
+              controller_in_slot_1 = None
+           
+            try:
+              controller_in_slot_3 = embedded_health['storage']['Controller in Slot 3']  
+              label_3              = embedded_health['storage']['Controller in Slot 3']['label']
+              status_3             = embedded_health['storage']['Controller in Slot 3']['status']
+              controller_status_3  = embedded_health['storage']['Controller in Slot 3']['controller_status']
+              model_3              = embedded_health['storage']['Controller in Slot 3']['model']
+              serial_number_3      = embedded_health['storage']['Controller in Slot 3']['serial_number']
+              fw_version_3         = embedded_health['storage']['Controller in Slot 3']['fw_version']
+            except:
+              controller_in_slot_3 = None
+
+            
+            if controller_on_system_board is not None:
+                # print_err( "MH %s controller: {}".format(label) % server_name )
+                if status.upper() == 'OK' and controller_status.upper() == 'OK':
+                    prometheus_metrics.hpilo_controller_status_gauge.labels(label=label,status=status,controller_status=controller_status,serial_number=serial_number,model=model,fw_version=fw_version,product_name=product_name,server_name=server_name).set(0)
+                else:
+                    prometheus_metrics.hpilo_controller_status_gauge.labels(label=label,status=status,controller_status=controller_status,serial_number=serial_number,model=model,fw_version=fw_version,product_name=product_name,server_name=server_name).set(1)
+
+
+            if controller_in_slot_1 is not None:
+                # print_err( "MH %s controller: {}".format(label_1) % server_name )
+                if status_1.upper() == 'OK' and controller_status_1.upper() == 'OK':
+                    prometheus_metrics.hpilo_controller_status_1_gauge.labels(label=label_1,status=status_1,controller_status=controller_status_1,serial_number=serial_number_1,model=model_1,fw_version=fw_version_1,product_name=product_name,server_name=server_name).set(0)
+                else:
+                    prometheus_metrics.hpilo_controller_status_1_gauge.labels(label=label_1,status=status_1,controller_status=controller_status_1,serial_number=serial_number_1,model=model_1,fw_version=fw_version_1,product_name=product_name,server_name=server_name).set(1)
+
+
+            if controller_in_slot_3 is not None: 
+                # print_err( "MH %s controller: {}".format(label_3) % server_name )
+                if status_3.upper() == 'OK' and controller_status_3.upper() == 'OK':
+                    prometheus_metrics.hpilo_controller_status_3_gauge.labels(label=label_3,status=status_3,controller_status=controller_status_3,serial_number=serial_number_3,model=model_3,fw_version=fw_version_3,product_name=product_name,server_name=server_name).set(0)
+                else:
+                    prometheus_metrics.hpilo_controller_status_3_gauge.labels(label=label_3,status=status_3,controller_status=controller_status_3,serial_number=serial_number_3,model=model_3,fw_version=fw_version_3,product_name=product_name,server_name=server_name).set(1)
+            # controller-end
+            
             health_at_glance = embedded_health['health_at_a_glance'] 
             if health_at_glance is not None:
                 for key, value in health_at_glance.items():
