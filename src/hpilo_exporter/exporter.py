@@ -13,6 +13,7 @@ import psutil  # process handling, zombies
 from _socket import gaierror
 
 import sys
+import traceback
 import hpilo
 
 import time
@@ -121,9 +122,57 @@ class RequestHandler(BaseHTTPRequestHandler):
             except:
                 server_name = ilo_host
 
+            # --------------------------------------------------
             # get iLO health information 
             embedded_health = ilo.get_embedded_health()
             # print_err('STRUCTURE: {}'.format(embedded_health))
+            # --------------------------------------------------
+            
+            # battery
+            try:
+                battery1_b = embedded_health['power_supplies']['Battery 1']
+                label_b = embedded_health['power_supplies']['Battery 1']['label']
+                present_b = embedded_health['power_supplies']['Battery 1']['present']
+                status_b = embedded_health['power_supplies']['Battery 1']['status']
+                model_b = embedded_health['power_supplies']['Battery 1']['model']
+                spare_b = embedded_health['power_supplies']['Battery 1']['spare']
+                serial_number_b = embedded_health['power_supplies']['Battery 1']['serial_number']
+                capacity_b = embedded_health['power_supplies']['Battery 1']['capacity']
+                firmware_version_b = embedded_health['power_supplies']['Battery 1']['firmware_version']
+                # print_err('%s LABEL_B: {}'.format(label_b) % server_name )
+
+            except BaseException as ex: # Python 3
+
+                battery1_b = None
+
+                # Get current system exception
+                ex_type, ex_value, ex_traceback = sys.exc_info()
+
+                # Extract unformatter stack traces as tuples
+                trace_back = traceback.extract_tb(ex_traceback)
+
+                # Format stacktrace
+                stack_trace = list()
+
+                for trace in trace_back:
+                   stack_trace.append("File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
+
+                print("Exception type : %s " % ex_type.__name__)
+                print("Exception message : %s" %ex_value)
+                print("Stack trace : %s" %stack_trace)
+                # print_err('%s BATTERY1-EXCEPT: {}'.format(str(ex)) % server_name )
+
+
+            if battery1_b is not None:
+                if status_b.upper() == 'OK':
+                    # (*1) The other battery metric "hpilo_battery_gauge" with other labels is below row 200 in this code  
+                    # The "_gauge" is not a component of the created metric name. Metric name is: "hpilo_battery" 
+                    # All labels here have to be defined in this file too: prometheus_metrics.py
+                    prometheus_metrics.hpilo_battery1_gauge.labels(label=label_b,present=present_b,status=status_b,model=model_b,spare=spare_b,serial_number=serial_number_b,capacity=capacity_b,firmware_version=firmware_version_b,product_name=product_name,server_name=server_name).set(0)
+                else:
+                    prometheus_metrics.hpilo_battery1_gauge.labels(label=label_b,present=present_b,status=status_b,model=model_b,spare=spare_b,serial_number=serial_number_b,capacity=capacity_b,firmware_version=firmware_version_b,product_name=product_name,server_name=server_name).set(1)
+            
+            # battery-end
             
             # controller
             # Parse Controller Info
