@@ -15,6 +15,7 @@ hpilo_controller_status_3_gauge = Gauge('hpilo_controller_status_3', 'HP iLO con
 # hpilo_vrm_gauge = Gauge('hpilo_vrm', 'HP iLO vrm status', ["product_name", "server_name"])
 # hpilo_drive_gauge = Gauge('hpilo_drive', 'HP iLO drive status', ["product_name", "server_name"])
 hpilo_battery_gauge = Gauge('hpilo_battery', 'HP iLO battery status  0 = OK, 1 = DEGRADED; 2 = Other', ["product_name", "server_name"])
+hpilo_battery1_gauge = Gauge('hpilo_battery1', 'HP iLO battery status  0 = OK, 1 = DEGRADED', ["label","present","status","model","spare","serial_number","capacity","firmware_version","product_name","server_name"])
 hpilo_storage_gauge = Gauge('hpilo_storage', 'HP iLO storage status  0 = OK, 1 = DEGRADED; 2 = Other', ["product_name", "server_name"])
 hpilo_fans_gauge = Gauge('hpilo_fans', 'HP iLO fans status  0 = OK, 1 = DEGRADED; 2 = Other', ["product_name", "server_name"])
 hpilo_bios_hardware_gauge = Gauge('hpilo_bios_hardware', 'HP iLO bios_hardware status  0 = OK, 1 = DEGRADED; 2 = Other', ["product_name", "server_name"])
