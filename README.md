@@ -6,6 +6,8 @@ This version is modified for Python3.
 The password is given by an environment variable ilo_password = os.getenv('ILO', 'ILO environment variable missing')
 You can set ILO in /etc/environment like this: ILO='xxx'
 
+Sample data: https://jsoneditoronline.org/#left=cloud.ed5e0fe56d8d4e0f94a53576c879f404&right=local.nalera
+
 ### Gauges
 
 Here are the status code of gauge
