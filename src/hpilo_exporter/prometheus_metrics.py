@@ -57,6 +57,6 @@ gauges = {
     'hpilo_firmware_version': hpilo_firmware_version,
     'hpilo_controller_status_gauge': hpilo_controller_status_gauge,
     'hpilo_controller_status_1_gauge': hpilo_controller_status_1_gauge,
-    'hpilo_controller_status_3_gauge': hpilo_controller_status_3_gauge
-
+    'hpilo_controller_status_3_gauge': hpilo_controller_status_3_gauge,
+    'hpilo_nic_status_gauge': hpilo_nic_status_gauge,
 }
