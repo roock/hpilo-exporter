@@ -29,6 +29,7 @@ hpilo_processor_gauge = Gauge('hpilo_processor', 'HP iLO processor status  0 = O
 hpilo_processor_detail_gauge = Gauge('hpilo_processor_detail', 'HP iLO processor detail', ["product_name", "server_name", "name", "status", "cpu_id", "speed"])
 hpilo_network_gauge = Gauge('hpilo_network', 'HP iLO network status  0 = OK, 1 = DEGRADED; 2 = Other', ["product_name", "server_name"])
 hpilo_temperature_gauge = Gauge('hpilo_temperature', 'HP iLO temperature status  0 = OK, 1 = DEGRADED; 2 = Other', ["product_name", "server_name"])
+hpilo_temperature_detail_gauge = Gauge('hpilo_temperature_detail', 'HP iLO temperature detail', ["product_name", "server_name", "label"])
 hpilo_firmware_version = Gauge('hpilo_firmware_version', 'HP iLO firmware version', ["product_name", "server_name", "management_processor", "license_type"])
 
 hpilo_nic_status_gauge = Gauge('hpilo_nic_status', 'HP iLO nic status  0 = OK, 1 = Disabled, 2 = Unknown, 3 = Link Down', ["product_name", "server_name", "nic_name", "mac_address", "ip_address", "network_port"])
@@ -52,6 +53,7 @@ gauges = {
     'hpilo_processor_detail_gauge': hpilo_processor_detail_gauge,
     'hpilo_network_gauge': hpilo_network_gauge,
     'hpilo_temperature_gauge': hpilo_temperature_gauge,
+    'hpilo_temperature_detail_gauge': hpilo_temperature_detail_gauge,
     'hpilo_firmware_version': hpilo_firmware_version,
     'hpilo_controller_status_gauge': hpilo_controller_status_gauge,
     'hpilo_controller_status_1_gauge': hpilo_controller_status_1_gauge,

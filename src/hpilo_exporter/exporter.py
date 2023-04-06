@@ -162,6 +162,11 @@ class RequestHandler(BaseHTTPRequestHandler):
                 print("Stack trace : %s" %stack_trace)
                 # print_err('%s BATTERY1-EXCEPT: {}'.format(str(ex)) % server_name )
 
+
+            for module in embedded_health['temperature'].values():
+                if module['status'] != 'Not Installed':
+                    prometheus_metrics.gauges["hpilo_temperature_detail_gauge"].labels(label=module['label'], product_name=product_name, server_name=server_name).set(int(module['currentreading'][0]))
+
             prometheus_metrics.gauges["hpilo_power_supplies_reading_gauge"].labels(product_name=product_name, server_name=server_name).set(int(embedded_health['power_supply_summary']['present_power_reading'].split()[0]))
 
 
