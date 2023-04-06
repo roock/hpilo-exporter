@@ -38,6 +38,7 @@ setup(
     install_requires=[
         "prometheus-client",
         "python-hpilo",
+        "psutil",
     ],
     entry_points={
         'console_scripts': [
