@@ -176,6 +176,10 @@ class RequestHandler(BaseHTTPRequestHandler):
             for cpu in embedded_health['processors'].values():
                 prometheus_metrics.gauges["hpilo_processor_detail_gauge"].labels(product_name=product_name, server_name=server_name, cpu_id=cpu['label'].split()[1], name=cpu['name'].strip(), status=cpu['status'], speed=cpu['speed']).set(1 if "OK" in cpu["status"] else 0)
 
+            for psu in embedded_health['power_supplies'].values():
+                capacity_w = 0 if psu["capacity"] == "N/A" else int(psu["capacity"].split()[0])
+                prometheus_metrics.gauges["hpilo_power_supplies_detail_gauge"].labels(product_name=product_name, server_name=server_name, psu_id=psu['label'].split()[-1], label=psu['label'], status=psu['status'], capacity_w=capacity_w, present=psu["present"]).set(1 if "Good" in psu["status"] else 0)
+
             if battery1_b is not None:
                 if status_b.upper() == 'OK':
                     # (*1) The other battery metric "hpilo_battery_gauge" with other labels is below row 200 in this code  
